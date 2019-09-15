@@ -11,13 +11,13 @@ $auth_token = 'a52264242589540a2bd5bb223ad55cf0';
 
 // A Twilio number you own with SMS capabilities
 $twilio_number = "+17068906270";
-
+$customized_message = 'DISTRESS SIGNAL ALERT: Your child has sent a HUNGER distress signal!';
 $client = new Client($account_sid, $auth_token);
 $client->messages->create(
     // Where to send a text message (your cell phone?)
     '+17622411175',
     array(
         'from' => $twilio_number,
-        'body' => 'I sent this message in under 10 minutes!'
+        'body' => $customized_message
     )
 );
