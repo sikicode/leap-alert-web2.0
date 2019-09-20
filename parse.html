@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base target="myframe">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="./leap-0.6.4.js"></script>
+    <script>
+        "use strict";
+        function getElementByXpath(path) {
+            return document.evaluate(path, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+        }
+        var swiped = 0;
+
+        $(document).ready(function() {
+            window.controller = new Leap.Controller({enableGestures: true});
+
+            var swiper = controller.gesture('swipe');
+
+            var tolerance = 10;
+            var cooloff = 30;
+            var x = 1;
+            var y = 1;
+
+            var updateHighlight = function() {
+                $('.grid div').removeClass('highlight');
+                $('.grid #d'+x+"_"+y).addClass('highlight');
+            }
+
+            var slider = _.debounce(function(xDir, yDir) {
+                if(x+xDir >= 0 && x+xDir <= 2){
+                    x += xDir;
+                }
+                if(y+yDir >= 0 && y+yDir <= 2){
+                    y += yDir;
+                }
+
+               /* x += xDir;
+                x = (x + 3) % 3;
+                y += yDir;
+                y = (y + 3) % 3;
+                */
+                console.log("x:"+x);
+                console.log("y:"+y);
+                console.log('.grid #d'+x+"_"+y);
+                updateHighlight();
+            }, cooloff);
+
+            swiper.update(function(g) {
+                if (Math.abs(g.translation()[0]) > tolerance || Math.abs(g.translation()[1]) > tolerance) {
+                   // var xDir = Math.abs(g.translation()[0]) > tolerance ? (g.translation()[0] > 0 ? -1 : 1) : 0;
+                    //var yDir = Math.abs(g.translation()[1]) > tolerance ? (g.translation()[1] < 0 ? -1 : 1) : 0;
+                    var xDir = 0;
+                    var yDir = 0;
+                    if(Math.abs(g.translation()[0]) > Math.abs(g.translation()[1])){
+                        xDir = (g.translation()[0] > 0 ? -1 : 1);
+                    }
+                    if(Math.abs(g.translation()[1]) > Math.abs(g.translation()[0])){
+                        yDir = (g.translation()[1] < 0 ? -1 : 1);
+                    }
+                    slider(xDir, yDir);
+
+                    if(x === 2 && y === 1 && swiped == 0) {
+                        window.open("https://www.youtube.com/watch?v=lFcSrYw-ARY", "_blank");
+                        swiped++;
+                    }else if(x === 0 && y === 1 && swiped == 0){
+                        window.open("http://0.0.0.0:3030/", "myframe");
+                        swiped++;
+                    }else if(x === 2 && y === 0 && swiped == 0){
+                        window.open("https://www.youtube.com/watch?v=Uo2SNtFofWI", "_blank");
+                        swiped++;
+                    }else if(x === 2 && y === 2 && swiped == 0){
+                        window.open("https://www.youtube.com/watch?v=HG0XFTxgHS4", "_blank");
+                        swiped++;
+                    }else if(x === 0 && y === 2 && swiped == 0){
+                        window.open("http://0.0.0.0:399/", "myframe"); //change url
+                        swiped++;
+                    }else if(x === 0 && y === 0 && swiped == 0){
+                        window.open("http://0.0.0.0:80/", "myframe"); //change url
+                        swiped++;
+                    }else{
+                        //nothing
+                    }
+                }
+
+            });
+
+            controller.connect();
+            updateHighlight();
+        });
+    </script>
+    <style>
+        .highlight {
+            border: 5px red solid !important;
+        }
+
+        .grid {
+            padding: 70px 400px;
+        }
+
+        .button{
+            margin: 70px 400px 0 400px;
+        }
+
+        .grid div {
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+            width: 100px;
+            height: 100px;
+            float: left;
+            border: 5px black solid;
+        }
+    </style>
+</head>
+<body>
+<div class="button">
+    <button onclick="controller.connection.enableGestures(true);">Enable Gestures</button>
+    <button onclick="controller.connection.enableGestures(false);">Disable Gestures</button>
+</div>
+<div class="grid">
+    <div id="d0_0"><label>Hungry SMS</label></div>
+    <div id="d1_0"><label></label></div>
+    <div id="d2_0"><label>Video</label></div><br clear=both>
+    <div id="d0_1"><label>Injury SMS</label></div>
+    <div id="d1_1"><label></label></div>
+    <div id="d2_1"><label>Video</label></div><br clear=both>
+    <div id="d0_2"><label>Emergency SMS</label></div>
+    <div id="d1_2"><label></label></div>
+    <div id="d2_2"><label>Video</label></div><br clear=both>
+</div>
+<iframe width="100%" height="200" name="myframe"></iframe>
+<script>
+</script>
+</body>
+</html>
